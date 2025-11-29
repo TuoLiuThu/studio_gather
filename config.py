@@ -33,4 +33,5 @@ DATA_SOURCES = {
 }
 
 # Configuration for Discovery
-LOOKBACK_HOURS = 24
+LOOKBACK_HOURS = 250
+
