@@ -23,6 +23,12 @@ DATA_SOURCES = {
             "url": "https://newsletter.semianalysis.com/feed", # Assuming RSS feed exists at /feed
             "type": "rss"
         },
+        # 这里是你新添加的 Dwarkesh Patel
+        {
+            "name": "Dwarkesh Podcast", 
+            "channel_id": "UCXl4i9dYBrFOabk0xGmbkRA", 
+            "type": "youtube"
+        }
         # Add more sources here as needed
         # {
         #     "name": "NVIDIA YouTube",
@@ -34,5 +40,6 @@ DATA_SOURCES = {
 
 # Configuration for Discovery
 LOOKBACK_HOURS = 250
+
 
 
