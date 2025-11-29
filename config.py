@@ -20,7 +20,7 @@ DATA_SOURCES = {
     "Hardware & Semi": [
         {
             "name": "SemiAnalysis",
-            "url": "https://semianalysis.com/feed", # Assuming RSS feed exists at /feed
+            "url": "https://newsletter.semianalysis.com/feed", # Assuming RSS feed exists at /feed
             "type": "rss"
         },
         # Add more sources here as needed
@@ -34,4 +34,5 @@ DATA_SOURCES = {
 
 # Configuration for Discovery
 LOOKBACK_HOURS = 250
+
 
