@@ -4,6 +4,7 @@ import discovery
 import ingest
 import analyzer
 import notifier
+import time  # <--- 新增
 
 # Configure logging
 logging.basicConfig(
@@ -34,6 +35,9 @@ def main():
     logger.info("Phase 2: Ingest & Analyze")
     analyzed_items = []
     
+    # 统计成功处理的个数，用于控制频率
+    processed_count = 0
+
     for item in items:
         # Ingest
         item_with_content = ingest.ingest_content(item)
@@ -44,6 +48,13 @@ def main():
         analyzed_item = analyzer.analyze_content(item_with_content)
         if analyzed_item:
             analyzed_items.append(analyzed_item)
+            processed_count += 1
+            
+            # === 核心修改：Gemini Free Tier 限流保护 ===
+            # 限制为 2 RPM (每分钟2次)，所以每次成功后暂停 35 秒
+            logger.info("Sleeping 35s to respect Gemini Free Tier rate limits...")
+            time.sleep(35) 
+            
         else:
             logger.warning(f"Skipping {item['title']} due to analysis failure.")
 
