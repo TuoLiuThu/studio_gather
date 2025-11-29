@@ -86,7 +86,7 @@ DATA_SOURCES = {
             "apple_id": "1700299886",
             "type": "apple_podcast"
         }
-    ]
+    ],
 
     # 5. 深度对话与顶级投资人 (Deep Dialogues & General Investing)
     "Deep Dialogues": [
@@ -132,5 +132,6 @@ DATA_SOURCES = {
 }
 
 LOOKBACK_HOURS = 200  # 建议改为 24 或 48 小时，250 小时会导致每次抓取量过大
+
 
 
