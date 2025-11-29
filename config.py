@@ -19,8 +19,9 @@ DATA_SOURCES = {
     # 1. AI 深度技术与工程
     "AI Engineering & Tech": [
         {
+            # 改用子域名 RSS，避开 api.substack.com 的 403 封锁
             "name": "Latent Space",
-            "url": "https://api.substack.com/feed/podcast/1075368.rss",
+            "url": "https://latentspace.substack.com/feed",
             "type": "rss"
         },
         {
@@ -38,13 +39,15 @@ DATA_SOURCES = {
     # 2. 行业新闻与硬核半导体
     "Industry & Hardware": [
         {
+            # 原链接 404，改为 Apple ID (The AI Daily Brief)
             "name": "The AI Daily Brief",
-            "url": "https://feeds.megaphone.fm/theaibreakdown",
-            "type": "rss"
+            "apple_id": "1680633614",
+            "type": "apple_podcast"
         },
         {
+            # 改用子域名 RSS
             "name": "Fabricated Knowledge",
-            "url": "https://api.substack.com/feed/podcast/399088.rss",
+            "url": "https://fabricatedknowledge.substack.com/feed",
             "type": "rss"
         }
     ],
@@ -61,7 +64,6 @@ DATA_SOURCES = {
             "url": "https://www.dwarkesh.com/feed",
             "type": "rss"
         },
-        # 使用 Apple ID 动态解析，防止源地址变动
         {
             "name": "No Priors",
             "apple_id": "1668002688", 
@@ -105,33 +107,35 @@ DATA_SOURCES = {
     # 6. 硅谷风向标 (Silicon Valley VC)
     "VC Trends": [
         {
+            # 原链接 404，改为 Apple ID (a16z Podcast)
             "name": "a16z Podcast",
-            "url": "https://feeds.simplecast.com/L88_9qBq",
-            "type": "rss"
+            "apple_id": "1416869662",
+            "type": "apple_podcast"
         },
         {
+            # 原链接 404，改为 Apple ID (All-In with Chamath, Jason, Sacks & Friedberg)
             "name": "All-In Podcast",
-            "url": "https://feeds.megaphone.fm/allin",
-            "type": "rss"
+            "apple_id": "1502871393",
+            "type": "apple_podcast"
         }
     ],
 
     # 7. AI 实战与中国视角 (AI Ops & China Tech)
     "AI Ops & Strategy": [
         {
+            # 原链接 404，改为 Apple ID (The Cognitive Revolution)
             "name": "The Cognitive Revolution",
-            "url": "https://feeds.transistor.fm/the-cognitive-revolution",
-            "type": "rss"
+            "apple_id": "1696784343",
+            "type": "apple_podcast"
         },
         {
+            # 原链接 404，改为 Apple ID (Tech Buzz China)
             "name": "Tech Buzz China",
-            "url": "https://feeds.megaphone.fm/LM3616641573",
-            "type": "rss"
+            "apple_id": "1370215715",
+            "type": "apple_podcast"
         }
     ]
 }
 
-LOOKBACK_HOURS = 200  # 建议改为 24 或 48 小时，250 小时会导致每次抓取量过大
-
-
-
+# 保持 7 天回顾，确保能抓到周更节目
+LOOKBACK_HOURS = 220
