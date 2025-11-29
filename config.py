@@ -87,7 +87,50 @@ DATA_SOURCES = {
             "type": "apple_podcast"
         }
     ]
+
+    # 5. 深度对话与顶级投资人 (Deep Dialogues & General Investing)
+    "Deep Dialogues": [
+        {
+            "name": "Lex Fridman Podcast",
+            "url": "https://lexfridman.com/feed/podcast/",
+            "type": "rss"
+        },
+        {
+            "name": "Invest Like the Best",
+            "url": "https://investlikethebest.libsyn.com/rss",
+            "type": "rss"
+        }
+    ],
+
+    # 6. 硅谷风向标 (Silicon Valley VC)
+    "VC Trends": [
+        {
+            "name": "a16z Podcast",
+            "url": "https://feeds.simplecast.com/L88_9qBq",
+            "type": "rss"
+        },
+        {
+            "name": "All-In Podcast",
+            "url": "https://feeds.megaphone.fm/allin",
+            "type": "rss"
+        }
+    ],
+
+    # 7. AI 实战与中国视角 (AI Ops & China Tech)
+    "AI Ops & Strategy": [
+        {
+            "name": "The Cognitive Revolution",
+            "url": "https://feeds.transistor.fm/the-cognitive-revolution",
+            "type": "rss"
+        },
+        {
+            "name": "Tech Buzz China",
+            "url": "https://feeds.megaphone.fm/LM3616641573",
+            "type": "rss"
+        }
+    ]
 }
 
 LOOKBACK_HOURS = 200  # 建议改为 24 或 48 小时，250 小时会导致每次抓取量过大
+
 
