@@ -19,10 +19,10 @@ DATA_SOURCES = {
     # 1. AI 深度技术与工程
     "AI Engineering & Tech": [
         {
-            # 改用子域名 RSS，避开 api.substack.com 的 403 封锁
+            # Substack 403 顽固，改用 Apple ID 尝试解析
             "name": "Latent Space",
-            "url": "https://latentspace.substack.com/feed",
-            "type": "rss"
+            "apple_id": "1675357900",
+            "type": "apple_podcast"
         },
         {
             "name": "Oxide and Friends",
@@ -39,16 +39,15 @@ DATA_SOURCES = {
     # 2. 行业新闻与硬核半导体
     "Industry & Hardware": [
         {
-            # 原链接 404，改为 Apple ID (The AI Daily Brief)
             "name": "The AI Daily Brief",
             "apple_id": "1680633614",
             "type": "apple_podcast"
         },
         {
-            # 改用子域名 RSS
+            # Substack 403 顽固，改用 Apple ID 尝试解析
             "name": "Fabricated Knowledge",
-            "url": "https://fabricatedknowledge.substack.com/feed",
-            "type": "rss"
+            "apple_id": "1656877017",
+            "type": "apple_podcast"
         }
     ],
 
@@ -107,13 +106,13 @@ DATA_SOURCES = {
     # 6. 硅谷风向标 (Silicon Valley VC)
     "VC Trends": [
         {
-            # 原链接 404，改为 Apple ID (a16z Podcast)
+            # 已修复：使用 Megaphone 新直链
             "name": "a16z Podcast",
-            "apple_id": "1416869662",
-            "type": "apple_podcast"
+            "url": "https://feeds.megaphone.fm/a16z",
+            "type": "rss"
         },
         {
-            # 原链接 404，改为 Apple ID (All-In with Chamath, Jason, Sacks & Friedberg)
+            # 已修复：Apple ID 1502871393 解析正确，保持不变
             "name": "All-In Podcast",
             "apple_id": "1502871393",
             "type": "apple_podcast"
@@ -123,19 +122,19 @@ DATA_SOURCES = {
     # 7. AI 实战与中国视角 (AI Ops & China Tech)
     "AI Ops & Strategy": [
         {
-            # 原链接 404，改为 Apple ID (The Cognitive Revolution)
+            # 已修复：使用 Megaphone 新直链
             "name": "The Cognitive Revolution",
-            "apple_id": "1696784343",
-            "type": "apple_podcast"
+            "url": "https://feeds.megaphone.fm/cognitive-revolution",
+            "type": "rss"
         },
         {
-            # 原链接 404，改为 Apple ID (Tech Buzz China)
+            # 已修复：使用 Megaphone 新直链
             "name": "Tech Buzz China",
-            "apple_id": "1370215715",
-            "type": "apple_podcast"
+            "url": "https://feeds.megaphone.fm/techbuzzchina",
+            "type": "rss"
         }
     ]
 }
 
-# 保持 7 天回顾，确保能抓到周更节目
-LOOKBACK_HOURS = 220
+# 保持 7 天回顾
+LOOKBACK_HOURS = 168
