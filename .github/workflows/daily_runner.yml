@@ -24,6 +24,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    # === 新增步骤：生成 Cookies 文件 ===
+    # 这步会将你保存在 GitHub Secrets 里的文本写入到服务器的文件里
+    - name: Create Cookies File
+      run: |
+        echo "${{ secrets.YOUTUBE_COOKIES }}" > cookies_burner.txt
+
     - name: Run Aggregator
       env:
         GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -32,4 +38,6 @@ jobs:
         EMAIL_SENDER: ${{ secrets.EMAIL_SENDER }}
         EMAIL_RECIPIENT: ${{ secrets.EMAIL_RECIPIENT }}
         YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        # 确保 Python 代码能找到刚才生成的文件
+        YOUTUBE_COOKIES_PATH: ./cookies_burner.txt 
       run: python main.py
