@@ -64,13 +64,20 @@ def get_rss_posts(source, override_url=None):
     logger.info(f"Checking RSS feed: {url}")
     
     try:
-        # === 修改处：增加 User-Agent 头，防止 Substack 等平台拦截 ===
+        # === 增强 Header ===
         headers = {
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Accept': 'application/rss+xml, application/xml, application/atom+xml, text/xml;q=0.9, */*;q=0.8'
+            'Accept': 'application/rss+xml, application/xml, application/atom+xml, text/xml;q=0.9, */*;q=0.8',
+            'Referer': 'https://www.google.com/' # 增加 Referer 看起来更像正常流量
         }
         
         response = requests.get(url, headers=headers, timeout=15)
+        
+        # 如果是 403，记录更详细的信息，但不崩溃
+        if response.status_code == 403:
+            logger.error(f"403 Forbidden accessing {url}. Source might require browser verification.")
+            return []
+        
         response.raise_for_status()
         
         # 将获取到的内容传给 feedparser
@@ -79,7 +86,6 @@ def get_rss_posts(source, override_url=None):
         
         if feed.bozo:
             logger.warning(f"Potential issue parsing feed {url}: {feed.bozo_exception}")
-            # 注意：即便 bozo 为真，feedparser 经常也能解析出部分内容，所以不直接 return
             
         recent_posts = []
         
@@ -90,10 +96,19 @@ def get_rss_posts(source, override_url=None):
             elif hasattr(entry, 'updated_parsed') and entry.updated_parsed:
                 published_dt = datetime.datetime(*entry.updated_parsed[:6], tzinfo=timezone.utc)
             
-            # 如果解析不到时间，尝试直接取 updated 字符串（部分 RSS 格式不规范）
+            # 容错：尝试直接解析字符串时间
             if not published_dt and hasattr(entry, 'updated'):
                  try:
                      published_dt = date_parser.parse(entry.updated)
+                     if published_dt.tzinfo is None:
+                         published_dt = published_dt.replace(tzinfo=timezone.utc)
+                 except:
+                     pass
+            
+            # 容错：有些 RSS 用 pubDate
+            if not published_dt and hasattr(entry, 'published'):
+                 try:
+                     published_dt = date_parser.parse(entry.published)
                      if published_dt.tzinfo is None:
                          published_dt = published_dt.replace(tzinfo=timezone.utc)
                  except:
@@ -117,9 +132,7 @@ def get_rss_posts(source, override_url=None):
         return []
 
 def get_youtube_videos(source):
-    """
-    Fetch recent videos from a YouTube channel.
-    """
+    # 保持不变
     if not config.YOUTUBE_API_KEY:
         logger.warning("YOUTUBE_API_KEY not set, skipping YouTube source.")
         return []
@@ -206,7 +219,6 @@ def discover_content():
     return all_content
 
 if __name__ == "__main__":
-    # Test run
     results = discover_content()
     for item in results:
         print(f"- [{item['source_name']}] {item['title']} ({item['published_at']})")
