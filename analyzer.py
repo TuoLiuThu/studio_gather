@@ -55,7 +55,7 @@ def analyze_content(item):
     """
 
     try:
-        model = genai.GenerativeModel('gemini-2.5-pro') # Using 1.5 Pro as proxy for "3 Pro"
+        model = genai.GenerativeModel('gemini-2.5-pro') # Using 2.5 Pro as proxy for "3 Pro"
         
         response = model.generate_content(
             prompt,
@@ -74,4 +74,5 @@ def analyze_content(item):
     except Exception as e:
         logger.error(f"Gemini analysis failed for {item['title']}: {e}")
         return None
+
 
