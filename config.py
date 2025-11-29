@@ -18,17 +18,24 @@ YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 YOUTUBE_COOKIES_PATH = os.path.join(os.path.dirname(__file__), 'cookies_burner.txt')
 
 DATA_SOURCES = {
-    # ... 保持不变 ...
     "Hardware & Semi": [
         {
             "name": "SemiAnalysis",
             "url": "https://newsletter.semianalysis.com/feed", 
             "type": "rss"
         },
+        # === 修改处：暂时停用 YouTube 源，改为 RSS 源直接抓取官网 ===
+        # 原 YouTube 配置 (保留备份)
+        # {
+        #     "name": "Dwarkesh Podcast (YouTube)", 
+        #     "channel_id": "UCXl4i9dYBrFOabk0xGmbkRA", 
+        #     "type": "youtube"
+        # },
+        # 新 RSS 配置 (直接指向官网 Feed)
         {
-            "name": "Dwarkesh Podcast", 
-            "channel_id": "UCXl4i9dYBrFOabk0xGmbkRA", 
-            "type": "youtube"
+            "name": "Dwarkesh Podcast",
+            "url": "https://www.dwarkesh.com/feed",
+            "type": "rss"
         }
     ]
 }
