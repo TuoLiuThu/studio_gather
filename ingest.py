@@ -22,12 +22,19 @@ def get_article_content(url):
     logger.info(f"Scraping article: {url}")
     try:
         app = FirecrawlApp(api_key=config.FIRECRAWL_API_KEY)
+        # 增加 timeout 选项 (如果 SDK 支持) 或仅保留 formats
         scrape_result = app.scrape_url(url, params={'formats': ['markdown']})
         
-        if 'markdown' in scrape_result:
-            return scrape_result['markdown']
+        # === 修改处：增强返回值的检查逻辑 ===
+        if scrape_result and 'markdown' in scrape_result:
+            content = scrape_result['markdown']
+            # 简单的长度检查，防止抓取到空页面
+            if len(content) < 100: 
+                logger.warning(f"Content too short for {url}, might be blocked or empty.")
+                return None
+            return content
         else:
-            logger.warning(f"No markdown content found for {url}")
+            logger.warning(f"No markdown content found for {url}. Result keys: {scrape_result.keys() if scrape_result else 'None'}")
             return None
     except Exception as e:
         logger.error(f"Firecrawl scraping failed for {url}: {e}")
@@ -151,13 +158,15 @@ def ingest_content(discovery_item):
     source_type = item.get('source_type')
 
     if source_type == 'rss' or source_type == 'website':
+        # 这里会自动调用 get_article_content，它使用 Firecrawl
+        # Dwarkesh 的 RSS url 会指向他的官网文章页，Firecrawl 能很好地处理这些页面
         content = get_article_content(item['url'])
         
     elif source_type == 'youtube':
         content = get_youtube_transcript(item['video_id'])
         
         # 即使失败了也要 sleep，防止死循环轰炸
-        sleep_time = random.uniform(20, 40) # 稍微增加一点等待时间
+        sleep_time = random.uniform(20, 40) 
         logger.info(f"YouTube rate limiting: Sleeping for {sleep_time:.2f} seconds...")
         time.sleep(sleep_time)
         
