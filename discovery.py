@@ -5,8 +5,9 @@ from dateutil import parser as date_parser
 import logging
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-import requests  # <--- 新增
+import requests
 import config
+import io
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -52,9 +53,8 @@ def get_feed_from_apple_id(apple_id):
 
 def get_rss_posts(source, override_url=None):
     """
-    Fetch recent posts from an RSS feed.
+    Fetch recent posts from an RSS feed with User-Agent spoofing.
     """
-    # 支持传入 override_url (用于 Apple 解析出来的 URL)
     url = override_url if override_url else source.get('url')
     
     if not url:
@@ -64,9 +64,22 @@ def get_rss_posts(source, override_url=None):
     logger.info(f"Checking RSS feed: {url}")
     
     try:
-        feed = feedparser.parse(url)
+        # === 修改处：增加 User-Agent 头，防止 Substack 等平台拦截 ===
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'application/rss+xml, application/xml, application/atom+xml, text/xml;q=0.9, */*;q=0.8'
+        }
+        
+        response = requests.get(url, headers=headers, timeout=15)
+        response.raise_for_status()
+        
+        # 将获取到的内容传给 feedparser
+        content_stream = io.BytesIO(response.content)
+        feed = feedparser.parse(content_stream)
+        
         if feed.bozo:
             logger.warning(f"Potential issue parsing feed {url}: {feed.bozo_exception}")
+            # 注意：即便 bozo 为真，feedparser 经常也能解析出部分内容，所以不直接 return
             
         recent_posts = []
         
@@ -77,6 +90,15 @@ def get_rss_posts(source, override_url=None):
             elif hasattr(entry, 'updated_parsed') and entry.updated_parsed:
                 published_dt = datetime.datetime(*entry.updated_parsed[:6], tzinfo=timezone.utc)
             
+            # 如果解析不到时间，尝试直接取 updated 字符串（部分 RSS 格式不规范）
+            if not published_dt and hasattr(entry, 'updated'):
+                 try:
+                     published_dt = date_parser.parse(entry.updated)
+                     if published_dt.tzinfo is None:
+                         published_dt = published_dt.replace(tzinfo=timezone.utc)
+                 except:
+                     pass
+
             if published_dt and is_recent(published_dt):
                 logger.info(f"Found recent article: {entry.title}")
                 recent_posts.append({
@@ -84,7 +106,7 @@ def get_rss_posts(source, override_url=None):
                     "url": entry.link,
                     "published_at": published_dt.isoformat(),
                     "source_name": source['name'],
-                    "source_type": "rss", # 统一标记为 rss，方便后续处理
+                    "source_type": "rss",
                     "category": source.get('category', "General")
                 })
         
@@ -95,7 +117,6 @@ def get_rss_posts(source, override_url=None):
         return []
 
 def get_youtube_videos(source):
-    # ... (保持原有的 get_youtube_videos 代码不变) ...
     """
     Fetch recent videos from a YouTube channel.
     """
@@ -113,7 +134,6 @@ def get_youtube_videos(source):
     try:
         youtube = build('youtube', 'v3', developerKey=config.YOUTUBE_API_KEY)
         
-        # Calculate RFC 3339 formatted date-time value (e.g., 1970-01-01T00:00:00Z)
         now = datetime.datetime.now(timezone.utc)
         published_after = (now - timedelta(hours=config.LOOKBACK_HOURS)).isoformat().replace('+00:00', 'Z')
 
@@ -162,7 +182,6 @@ def discover_content():
     for category, sources in config.DATA_SOURCES.items():
         for source in sources:
             try:
-                # 为所有内容打上分类标签
                 source['category'] = category 
 
                 if source['type'] == 'rss':
@@ -173,12 +192,9 @@ def discover_content():
                     videos = get_youtube_videos(source)
                     all_content.extend(videos)
                 
-                # === 新增：Apple Podcast 类型处理 ===
                 elif source['type'] == 'apple_podcast':
-                    # 动态获取 RSS URL
                     rss_url = get_feed_from_apple_id(source['apple_id'])
                     if rss_url:
-                        # 复用 get_rss_posts 逻辑，传入解析到的 URL
                         posts = get_rss_posts(source, override_url=rss_url)
                         all_content.extend(posts)
 
