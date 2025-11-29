@@ -3,6 +3,7 @@ import json
 import logging
 import config
 import typing_extensions as typing
+import re  # <--- 新增这一行
 
 logger = logging.getLogger(__name__)
 
@@ -65,14 +66,31 @@ def analyze_content(item):
             )
         )
         
-        result = json.loads(response.text)
+        # === 新增：数据清洗逻辑 ===
+        raw_text = response.text.strip() # 获取文本并去除首尾空格
+        
+        # 1. 如果以 ``` 开头，说明有 Markdown 包装
+        if raw_text.startswith("```"):
+            # 使用正则去掉第一行 (例如 ```json)
+            raw_text = re.sub(r"^```[a-zA-Z]*\n", "", raw_text)
+            # 去掉结尾的 ```
+            if raw_text.endswith("```"):
+                raw_text = raw_text[:-3].strip()
+        
+        # 打印前200个字符到日志，方便调试（可选）
+        logger.info(f"Cleaned JSON content: {raw_text[:200]}...")
+        
+        result = json.loads(raw_text)
+        # ========================
         
         # Merge analysis with original item
         item.update(result)
         return item
 
     except Exception as e:
+        # 增加更详细的错误日志
         logger.error(f"Gemini analysis failed for {item['title']}: {e}")
+        if 'raw_text' in locals():
+            logger.error(f"Failed Raw Text: {raw_text}")
         return None
-
 
